@@ -1,30 +1,131 @@
 # Reinforcement Learning Trading Bot
 
-A sophisticated trading bot built with reinforcement learning that uses deep Q-learning and policy gradients to make informed trading decisions in financial markets.
+A reinforcement learning based Forex trading bot that trains and evaluates a PPO (Proximal Policy Optimization) agent in a custom trading environment.
 
-## 📋 Table of Contents
+## Overview
 
-- [Overview](#overview)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
+This project learns trading behavior from historical EURUSD OHLCV data. It includes:
+- Feature engineering with technical indicators
+- A custom Gym-style trading environment
+- PPO training with checkpointing
+- Out-of-sample evaluation and equity curve plotting
+- Trade history export during testing
 
-## 🎯 Overview
+## Features
 
-This project implements an intelligent trading bot powered by reinforcement learning algorithms. The bot learns from historical market data and develops trading strategies by interacting with a custom trading environment. It uses state-of-the-art deep learning techniques to optimize trading decisions and maximize returns while managing risk.
+- Custom Forex environment with spread, slippage, TP/SL options, and reward shaping
+- PPO agent training via `stable-baselines3`
+- Train/test split workflow
+- Automatic checkpoint saving during training
+- Best-model selection using out-of-sample final equity
+- Evaluation plots and CSV trade export
 
-## ✨ Features
+## Project Structure
 
-- **Custom Trading Environment**: Realistic market simulation with order execution and portfolio management
-- **Reinforcement Learning Agent**: Deep Q-Network (DQN) and policy gradient-based trading strategies
-- **Technical Indicators**: Multiple technical analysis indicators (RSI, MACD, Bollinger Bands, etc.)
-- **Backtesting**: Comprehensive testing framework to evaluate agent performance
-- **Portfolio Management**: Real-time position tracking and risk management
-- **Flexible Configuration**: Easy-to-customize hyperparameters and market conditions
-- **Performance Metrics**: Detailed analytics including returns, Sharpe ratio, and drawdown analysis
+```text
+Reinforcement Learning Trading Bot/
+├─ README.md
+├─ .gitignore
+├─ ReinforcementTrading_Part_1/
+│  ├─ indicators.py
+│  ├─ trading_env.py
+│  ├─ train_agent.py
+│  ├─ test_agent.py
+│  ├─ Requirements.txt
+│  └─ data/
+│     ├─ EURUSD_Candlestick_1_Hour_BID_01.07.2020-15.07.2023.csv
+│     └─ test_EURUSD_Candlestick_1_Hour_BID_20.02.2023-22.02.2025.csv
+└─ venv/
+```
 
-## 📁 Project Structure
+## Installation (Windows PowerShell)
+
+1. Move to the project folder:
+
+```powershell
+cd "d:\Reinforcement Learning Trading Bot\ReinforcementTrading_Part_1"
+```
+
+2. Create a virtual environment:
+
+```powershell
+py -m venv venv
+```
+
+3. Activate it:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+4. Install dependencies:
+
+```powershell
+pip install -r Requirements.txt
+```
+
+## Usage
+
+### 1) Train the agent
+
+```powershell
+python train_agent.py
+```
+
+Training script behavior:
+- Loads and preprocesses market data
+- Splits data into train/test segments
+- Trains PPO and saves checkpoints under `./checkpoints`
+- Selects best model by out-of-sample final equity
+- Saves best model as `model_eurusd_best.zip`
+- Plots in-sample and out-of-sample equity curves
+
+### 2) Evaluate the trained agent
+
+```powershell
+python test_agent.py
+```
+
+Test script behavior:
+- Loads `model_eurusd_best.zip`
+- Runs one full evaluation episode
+- Saves closed trades to `trade_history_output.csv` (if any)
+- Displays equity curve
+
+## Configuration
+
+Tune these parameters directly in scripts:
+
+- Data path (`file_path`) in `train_agent.py` and `test_agent.py`
+- Stop-loss / take-profit options (`SL_OPTS`, `TP_OPTS`)
+- Observation window (`WIN`)
+- Environment frictions:
+  - `spread_pips`
+  - `commission_pips`
+  - `max_slippage_pips`
+- Reward shaping:
+  - `hold_reward_weight`
+  - `open_penalty_pips`
+  - `time_penalty_pips`
+  - `unrealized_delta_weight`
+- Training timesteps (`total_timesteps`) in `train_agent.py`
+
+Important: Keep environment parameters aligned between training and testing for consistent results.
+
+## Outputs
+
+Common generated artifacts:
+- `checkpoints/` (intermediate PPO checkpoints)
+- `model_eurusd_best.zip` (best selected model)
+- `trade_history_output.csv` (closed trades from test run)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
+
+## License
+
+Add your preferred license file (for example, MIT) and update this section.
